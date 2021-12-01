@@ -54,7 +54,7 @@ MAX_TRAIN_T = 200  # how many steps for 1 training episode - 200
 MAX_TEST_T = 200  # '' - 200
 STREAK_TO_END = 100  # how many consecutive wins to end
 SOLVED_T = 195  # how many rewards/steps/time pole can stay upright to consider as 1 win episode
-VERBOSE = True  # print data
+VERBOSE = False  # print data
 
 #train 1 episode
 def train(episode):
@@ -100,50 +100,63 @@ def train(episode):
             print("Best Q: %f" % best_q)
             print("Explore rate: %f" % explore_rate)
             print("Learning rate: %f" % learning_rate)
-            print("Streaks: %d" % num_train_streaks)
+            
 
-        if done:
-            print("Episode %d finished after %f time steps" % (episode, t))
-            
-    episode += 1
-    return episode
-            
 #test agent by running 120 
-def test():
-
-    print(q_table)
-    num_test_streaks = 0
-
-    for episode in range(NUM_TEST_EPISODES):
-
+def test(episode):
+    total_reward_all_eps = 0 # total reward obtained in all testing ep
+    max_test_ep_reward = 0 # max total reward obtained in all testing eps
+    
+    # complete training with _ no. of episode
+    for streaks in range(STREAK_TO_END):
         # Reset the environment
         obv = env.reset()
-
+        
         # the initial state
         state_0 = state_to_bucket(obv)
-
-        # basic initializations
-        tt = 0
-        done = False
-
-        while ((abs(obv[0]) < 2.4) & (abs(obv[2]) < 45)):
-        # while not(done):
-            tt += 1
+        done = False 
+        
+        #total reward obtained in 1 ep
+        test_ep_reward = 0
+        
+        # complete 1 testing episode
+        while(not(done)):
+            # t = current timestep in episode [0-199]
             # env.render()
 
-            # Select an action
-            action = select_action(state_0, 0)
-            # action = select_action(state_0, TEST_RAND_PROB)
-            # action = select_action(state_0, 0.01)
+            # Select an action, policy = select action with highest q-value
+            action = action = np.argmax(q_table[state_0])
 
             # Execute the action
             obv, reward, done, _ = env.step(action)
 
             # Observe the result
-            state_0 = state_to_bucket(obv)
-
-            print("Test episode %d; time step %f." % (episode, tt))
+            state = state_to_bucket(obv)
             
+            # Setting up for the next iteration
+            state_0 = state
+            test_ep_reward += reward
+
+        # at end of each testing episode
+        total_reward_all_eps += test_ep_reward  
+        if(test_ep_reward > max_test_ep_reward):
+            max_test_ep_reward = test_ep_reward
+       
+      # at end of testing round  
+    print('Average reward / 100 test episodes: ', total_reward_all_eps/STREAK_TO_END)
+        
+    # if total_reward_all_eps/STREAK_TO_END >= SOLVED_T:
+    #     problem_solved = True
+    # else: 
+    #     problem_solved = False
+    
+    if episode == 100:
+        problem_solved = True
+    else: 
+        problem_solved = False
+        
+    return problem_solved
+         
     #   if (t >= SOLVED_T):
     #                num_train_streaks += 1
     #            else:
@@ -191,13 +204,14 @@ def state_to_bucket(state):
     return tuple(bucket_indice)
 
 if __name__ == "__main__":
-    episode = 0
-    problem_solved = False  #is agent successfully trained
-    while problem_solved:
+    episode = 1
+    problem_solved = False  #agent successfully trained
+    while (not(problem_solved)):
         print('Training ...')
-        episode = train(episode)
-        print('Testing ...')
-        problem_solve = test(episode)
-    print("Problem solved at training episode ", episode)
+        train(episode)
+        print('Testing episode ', episode, '...')
+        problem_solved = test(episode)
+        episode += 1
+    print("Problem solved at training episode ", episode-1)
     print("Q-table:", q_table)
 
