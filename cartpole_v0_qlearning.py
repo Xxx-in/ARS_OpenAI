@@ -150,7 +150,7 @@ def test(episode):
     # else: 
     #     problem_solved = False
     
-    if episode == 100:
+    if  total_reward_all_eps/STREAK_TO_END >= SOLVED_T:
         problem_solved = True
     else: 
         problem_solved = False
