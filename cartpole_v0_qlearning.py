@@ -39,7 +39,9 @@ ACTION_INDEX = len(NUM_BUCKETS) #4
 
 ## Creating a (global) Q-Table for each state-action pair
 q_table = np.zeros(NUM_BUCKETS + (NUM_ACTIONS,))
-ep = 0
+
+rewards_record = np.zeros(100) # array to store reward obtained in latest 100 episode
+num_train_streaks = 0   # total consecutive episodes with reward >= 195
 
 ## Learning related constants
 # Continue here
@@ -48,12 +50,10 @@ MIN_LEARNING_RATE = 0.1
 TEST_RAND_PROB = 0.2
 
 ## Defining the simulation related constants
-NUM_TRAIN_EPISODES = 10  # how many training episodes - 180
-NUM_TEST_EPISODES = 1  # how many testing episodes (should ) - 1
 MAX_TRAIN_T = 200  # how many steps for 1 training episode - 200
-MAX_TEST_T = 200  # '' - 200
+MAX_TEST_T = 200  # how many steps for 1 testing episode - 200
 STREAK_TO_END = 100  # how many consecutive wins to end
-SOLVED_T = 195  # how many rewards/steps/time pole can stay upright to consider as 1 win episode
+SOLVED_T = 195  # how many rewards/ time steps which pole stayed upright to consider as 1 successful episode
 VERBOSE = False  # print data
 
 #train 1 episode
@@ -100,77 +100,34 @@ def train(episode):
             print("Best Q: %f" % best_q)
             print("Explore rate: %f" % explore_rate)
             print("Learning rate: %f" % learning_rate)
-            
+        
+        if done:
+            rewards_record[episode%100] = t+1
+            break
+        
+#test if q-table has reached convergence
+def test(episode, rewards_record, num_train_streaks):
 
-#test agent by running 120 
-def test(episode):
-    total_reward_all_eps = 0 # total reward obtained in all testing ep
-    max_test_ep_reward = 0 # max total reward obtained in all testing eps
+    # record total consecutive successful episode
+    if (rewards_record[episode%100] >= SOLVED_T):
+        num_train_streaks += 1
+    else:
+        num_train_streaks = 0
+
+    # problem considered trained when q-table can achieve 100 consecutive successful episodes  
+    if num_train_streaks > STREAK_TO_END:
+        print("Model trained after %d episodes" % (episode+1-100))
+
+    average = np.mean(rewards_record)
+    print('Average:', average)
     
-    # complete training with _ no. of episode
-    for streaks in range(STREAK_TO_END):
-        # Reset the environment
-        obv = env.reset()
-        
-        # the initial state
-        state_0 = state_to_bucket(obv)
-        done = False 
-        
-        #total reward obtained in 1 ep
-        test_ep_reward = 0
-        
-        # complete 1 testing episode
-        while(not(done)):
-            # t = current timestep in episode [0-199]
-            # env.render()
-
-            # Select an action, policy = select action with highest q-value
-            action = action = np.argmax(q_table[state_0])
-
-            # Execute the action
-            obv, reward, done, _ = env.step(action)
-
-            # Observe the result
-            state = state_to_bucket(obv)
-            
-            # Setting up for the next iteration
-            state_0 = state
-            test_ep_reward += reward
-
-        # at end of each testing episode
-        total_reward_all_eps += test_ep_reward  
-        if(test_ep_reward > max_test_ep_reward):
-            max_test_ep_reward = test_ep_reward
-       
-      # at end of testing round  
-    print('Average reward / 100 test episodes: ', total_reward_all_eps/STREAK_TO_END)
-        
-    # if total_reward_all_eps/STREAK_TO_END >= SOLVED_T:
-    #     problem_solved = True
-    # else: 
-    #     problem_solved = False
-    
-    if  total_reward_all_eps/STREAK_TO_END >= SOLVED_T:
+    if average >= 195 and episode > 100:
         problem_solved = True
-    else: 
+    else:
         problem_solved = False
         
-    return problem_solved
+    return problem_solved, num_train_streaks
          
-    #   if (t >= SOLVED_T):
-    #                num_train_streaks += 1
-    #            else:
-    #                num_train_streaks = 0
-    #            break
-
-    #         #sleep(0.25)
-
-    #     # It's considered done when it's solved over 120 times consecutively
-    #     if num_train_streaks > STREAK_TO_END:
-    #         break
-
-
-
 def select_action(state, explore_rate):
     # Select a random action
     if random.random() < explore_rate:
@@ -204,14 +161,14 @@ def state_to_bucket(state):
     return tuple(bucket_indice)
 
 if __name__ == "__main__":
-    episode = 1
+    episode = 0
     problem_solved = False  #agent successfully trained
     while (not(problem_solved)):
-        print('Training ...')
+        print('Training episode', episode, '...')
         train(episode)
-        print('Testing episode ', episode, '...')
-        problem_solved = test(episode)
+        print('Testing episode', episode, '...')
+        problem_solved, num_train_streaks = test(episode,rewards_record,num_train_streaks)
         episode += 1
-    print("Problem solved at training episode ", episode-1)
-    print("Q-table:", q_table)
+    print("Episodes before solved: {}".format(episode-100))
+    # print("Q-table:", q_table)
 
