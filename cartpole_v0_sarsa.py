@@ -94,15 +94,15 @@ def train(episode, q_table):
         action_0 = action_1
 
         # Print data
-        if (VERBOSE):
-            print("\nEpisode = %d" % episode)
-            print("t = %d" % t)
-            print("Action: %d" % action)
-            print("State: %s" % str(state))
-            print("Reward: %f" % reward)
-            print("Best Q: %f" % best_q)
-            print("Explore rate: %f" % explore_rate)
-            print("Learning rate: %f" % learning_rate)
+        # if (VERBOSE):
+        #     print("\nEpisode = %d" % episode)
+        #     print("t = %d" % t)
+        #     print("Action: %d" % action_0)
+        #     print("State: %s" % str(state_0))
+        #     print("Reward: %f" % reward)
+        #     print("Best Q within action_1: %f" % max(q_table[state_0][action_1]))
+        #     print("Explore rate: %f" % explore_rate)
+        #     print("Learning rate: %f" % learning_rate)
         
         if done:
             rewards_record[episode%100] = t+1
@@ -173,8 +173,4 @@ if __name__ == "__main__":
         problem_solved, num_train_streaks = test(episode,rewards_record,num_train_streaks)
         episode += 1
     print("Episodes before solved: {}".format(episode-100))
-    # for i in range(2):
-    #     print('Training episode', episode, '...')
-    #     train(episode)
-    #     episode += 1
     print("Q-table:", q_table)
