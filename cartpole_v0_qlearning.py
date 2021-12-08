@@ -57,7 +57,7 @@ SOLVED_T = 195  # how many rewards/ time steps which pole stayed upright to cons
 VERBOSE = False  # print data
 
 #train 1 episode
-def train(episode):
+def train(episode,q_table):
 
     ## Instantiating the learning related parameters
     learning_rate = get_learning_rate(episode)
@@ -103,7 +103,7 @@ def train(episode):
         
         if done:
             rewards_record[episode%100] = t+1
-            break
+            return q_table
         
 #test if q-table has reached convergence
 def test(episode, rewards_record, num_train_streaks):
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     problem_solved = False  #agent successfully trained
     while (not(problem_solved)):
         print('Training episode', episode, '...')
-        train(episode)
+        train(episode, q_table)
         print('Testing episode', episode, '...')
         problem_solved, num_train_streaks = test(episode,rewards_record,num_train_streaks)
         episode += 1
