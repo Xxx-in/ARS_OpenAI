@@ -70,25 +70,28 @@ def train(episode):
     # the initial state
     state_0 = state_to_bucket(obv)
 
+    # Select an action
+    action_0 = select_action(state_0, explore_rate)
+    
     #for each timestep in 1 episode
     for t in range(MAX_TRAIN_T):
         # env.render()
-
-        # Select an action
-        action = select_action(state_0, explore_rate)
-
+        
         # Execute the action
-        obv, reward, done, _ = env.step(action)
+        obv, reward, done, _ = env.step(action_0)
 
         # Observe the result
-        state = state_to_bucket(obv)
+        state_1 = state_to_bucket(obv)
+        
+        # Select an action
+        action_1 = select_action(state_1, explore_rate)
 
         # Update the Q based on the result
-        best_q = np.amax(q_table[state])
-        q_table[state_0 + (action,)] += learning_rate*(reward + discount_factor*(best_q) - q_table[state_0 + (action,)])
+        q_table[state_0 ][action_0] += learning_rate*(reward + discount_factor*(q_table[state_1][action_1]) - q_table[state_0][action_0])
 
         # Setting up for the next iteration
-        state_0 = state
+        state_0 = state_1
+        action_0 = action_1
 
         # Print data
         if (VERBOSE):
@@ -170,4 +173,8 @@ if __name__ == "__main__":
         problem_solved, num_train_streaks = test(episode,rewards_record,num_train_streaks)
         episode += 1
     print("Episodes before solved: {}".format(episode-100))
+    # for i in range(2):
+    #     print('Training episode', episode, '...')
+    #     train(episode)
+    #     episode += 1
     print("Q-table:", q_table)
