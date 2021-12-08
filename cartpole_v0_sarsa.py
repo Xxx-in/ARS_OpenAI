@@ -106,7 +106,7 @@ def train(episode, q_table):
         
         if done:
             rewards_record[episode%100] = t+1
-            return q_table
+            return q_table, t+1
         
 #test if q-table has reached convergence
 def test(episode, rewards_record, num_train_streaks):
@@ -166,9 +166,10 @@ def state_to_bucket(state):
 if __name__ == "__main__":
     episode = 0
     problem_solved = False  #agent successfully trained
+    current_ep_reward = 0
     while (not(problem_solved)):
         print('Training episode', episode, '...')
-        train(episode,q_table)
+        q_table, current_ep_reward = train(episode,q_table)
         print('Testing episode', episode, '...')
         problem_solved, num_train_streaks = test(episode,rewards_record,num_train_streaks)
         episode += 1
