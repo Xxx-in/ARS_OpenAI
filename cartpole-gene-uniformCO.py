@@ -59,9 +59,6 @@ def fitness_function(q_table):
             state_0 = ql.state_to_bucket(obv)
             done = False 
             
-            #total reward obtained in 1 ep
-            test_t = 0
-            
             # complete 1 testing episode
             while(not(done)):
             # env.render()
@@ -77,11 +74,7 @@ def fitness_function(q_table):
                 
                 # Setting up for the next iteration
                 state_0 = state
-                test_t += 1
-                
-            # at end of testing round 
-            if done: 
-                rewards_record[arr_index_state_3][arr_index_state_4] = test_t
+                rewards_record[arr_index_state_3][arr_index_state_4] += reward
                           
     return rewards_record, np.mean(rewards_record)
 
