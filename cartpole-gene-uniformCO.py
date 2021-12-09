@@ -40,20 +40,18 @@ class solution_chromosome:
 #fitness function = average reward obtained when starting from all 18 diff states
 def fitness_function(q_table):
     #array to store observation values that corresponding to each bucket of pole velocity (after state discretization)
-    state_3_arr = [-1, -0.2, 0,	0.1, 0.2, 0.4]
+    pole_angle = [-1, -0.2, 0,	0.1, 0.2, 0.4]
     #array to store observation values that corresponding to each bucket of  angular velocity at pole tip (after state discretization)
-    state_4_arr = [-1, -0.4, 0.6]
-    arr_index_state_3 = 0
-    arr_index_state_4 = 0
+    pole_tip_velocity = [-1, -0.4, 0.6]
     #create array which corresponds to size of discretized state space to hold total reward obtained when starting from each state
     rewards_record = np.zeros([ql.NUM_BUCKETS[2] , ql.NUM_BUCKETS[3]])
 
     # when reset, env is set to each corresponding discretized state bucket
-    for pole_angle in state_3_arr:
-        for pole_tip_velocity in state_4_arr:
+    for x in range(ql.NUM_BUCKETS[2]):
+        for y in range(ql.NUM_BUCKETS[3]):
             
             # Reset the environment
-            obv = env.fitness_test_reset([0, 0, pole_angle, pole_tip_velocity])
+            obv = env.fitness_test_reset([0, 0, pole_angle[x], pole_tip_velocity[y]])
 
             # the initial state
             state_0 = ql.state_to_bucket(obv)
@@ -74,8 +72,8 @@ def fitness_function(q_table):
                 
                 # Setting up for the next iteration
                 state_0 = state
-                rewards_record[arr_index_state_3][arr_index_state_4] += reward
-                          
+                rewards_record[x][y] += reward
+
     return rewards_record, np.mean(rewards_record)
 
 def uniform_crossover (parent1, parent2):
@@ -182,18 +180,18 @@ if __name__ == "__main__":
         parent1_avg_reward_return[episode%100] = parent1.avg_reward
         convergence = converge(parent1_avg_reward_return)
         episode += 1
-        print('episode', episode) 
-        print(episode, 'table:', parent1.q_table)  
-        print(convergence)
-        print('rewards_record',parent1.rewards_record)
-        print('avg_record',parent1.avg_reward)
-        print(episode, parent1.current_train_ep_reward)
-    #     if episode == 50:
-    #         print(parent1.q_table) 
-    #         print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
-    # print (parent1.q_table)
-    # print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
-    
+        # print('episode', episode) 
+        # print(episode, 'table:', parent1.q_table)  
+        # print(convergence)
+        # print('rewards_record',parent1.rewards_record)
+        # print('avg_record',parent1.avg_reward)
+        # print(episode, parent1.current_train_ep_reward)
+        # if episode == 50:
+        #     print(parent1.q_table) 
+        #     print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
+        # print (parent1.q_table)
+        # print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
+        
 
 
 
