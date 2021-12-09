@@ -35,7 +35,7 @@ class solution_chromosome:
         self.q_table = np.zeros(ql.NUM_BUCKETS + (ql.NUM_ACTIONS,))
         self.rewards_record = np.zeros([ql.NUM_BUCKETS[2] , ql.NUM_BUCKETS[3]])
         self.avg_reward = 0
-        self.current_train_ep_reward = 0
+        self.current_train_ep_reward = np.zeros(100)
     
 #fitness function = average reward obtained when starting from all 18 diff states
 def fitness_function(q_table):
@@ -143,8 +143,8 @@ if __name__ == "__main__":
     child2 = solution_chromosome()
     
     #initial population = 1 sarsa + 1 q-learning + 2 children
-    parent1.q_table, parent1.current_train_ep_reward = ql.train(episode, parent1.q_table)
-    parent2.q_table, parent1.current_train_ep_reward = sarsa.train(episode, parent2.q_table)
+    parent1.q_table, parent1.current_train_ep_reward[episode%100] = ql.train(episode, parent1.q_table)
+    parent2.q_table, parent1.current_train_ep_reward[episode%100] = sarsa.train(episode, parent2.q_table)
     child1,child2 = uniform_crossover(parent1, parent2) # crossover to form another 2 solution chromosome as population
     
     #compute fitness
@@ -167,10 +167,10 @@ if __name__ == "__main__":
         child2.q_table = mutation(child2)
 
         #train child
-        child1.q_table, child1.current_train_ep_reward = ql.train(episode, child1.q_table)
-        child2.q_table, child2.current_train_ep_reward  = sarsa.train(episode, child2.q_table)
-        parent1.q_table, parent1.current_train_ep_reward  = ql.train(episode, parent1.q_table)
-        parent2.q_table, parent2.current_train_ep_reward  = sarsa.train(episode, parent2.q_table)
+        child1.q_table, child1.current_train_ep_reward[episode%100] = ql.train(episode, child1.q_table)
+        child2.q_table, child2.current_train_ep_reward[episode%100]  = sarsa.train(episode, child2.q_table)
+        parent1.q_table, parent1.current_train_ep_reward[episode%100]  = ql.train(episode, parent1.q_table)
+        parent2.q_table, parent2.current_train_ep_reward[episode%100]  = sarsa.train(episode, parent2.q_table)
         
         #compute fitness function for trained child
         child1.rewards_record, child1.avg_reward  = fitness_function(child1.q_table)
@@ -185,7 +185,7 @@ if __name__ == "__main__":
         # print(convergence)
         # print('rewards_record',parent1.rewards_record)
         print('avg_record',parent1.avg_reward)
-        # print(episode, parent1.current_train_ep_reward)
+        # print(episode, parent1.current_train_ep_reward[episode%100])
         # if episode == 50:
         #     print(parent1.q_table) 
         #     print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
@@ -195,10 +195,6 @@ if __name__ == "__main__":
         f.write('episode {}\n'. format(episode))
         f.write('Avg reward:\n {} {} {} {} \n'.format(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward))
         f.write('Q-table \n Parent1:\n {}\n\n {} \n{} \n\n{}\n {}\n\n {}\n {}\n\n '.format(parent1.q_table, 'Parent2: ', parent2.q_table, 'Child1: ', child1.q_table, 'Child2:', child2.q_table))
-        f.write('Current train ep reward \n: {} {} {} {}'.format(parent1.current_train_ep_reward, parent2.current_train_ep_reward, child1.current_train_ep_reward, child2.current_train_ep_reward))
+        f.write('Current train ep reward \n: {} {} {} {}'.format(parent1.current_train_ep_reward[episode%100], parent2.current_train_ep_reward[episode%100], child1.current_train_ep_reward[episode%100], child2.current_train_ep_reward[episode%100]))
 
     f.close()
-
-
-
-
