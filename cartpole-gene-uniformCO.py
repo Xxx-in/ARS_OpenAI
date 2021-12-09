@@ -49,30 +49,29 @@ def fitness_function(q_table):
     # when reset, env is set to each corresponding discretized state bucket
     for x in range(ql.NUM_BUCKETS[2]):
         for y in range(ql.NUM_BUCKETS[3]):
-            
             # Reset the environment
-            obv = env.fitness_test_reset([0, 0, pole_angle[x], pole_tip_velocity[y]])
+            obv = env.reset()
 
             # the initial state
             state_0 = ql.state_to_bucket(obv)
-            done = False 
-            
-            # complete 1 testing episode
+            done = False
+                
             while(not(done)):
-            # env.render()
-
-                # Select an action, policy = select action with highest q-value
-                action = np.argmax(q_table[state_0])
-
+                # Select an action
+                action_0 = np.argmax(q_table[state_0])
+            
                 # Execute the action
-                obv, reward, done, _ = env.step(action)
+                obv, reward, done, _ = env.step(action_0)
 
                 # Observe the result
-                state = ql.state_to_bucket(obv)
+                state_1 = ql.state_to_bucket(obv)
+                rewards_record[x][y] += reward
                 
                 # Setting up for the next iteration
-                state_0 = state
-                rewards_record[x][y] += reward
+                state_0 = state_1
+                
+                if done :
+                    break
 
     return rewards_record, np.mean(rewards_record)
 
@@ -133,6 +132,7 @@ def converge(avg_record_list):
        
     
 if __name__ == "__main__":
+    f = open("geneAlgo.txt", "w")
     episode = 0
     parent1_avg_reward_return = np.zeros(100)
     convergence = False
@@ -180,18 +180,24 @@ if __name__ == "__main__":
         parent1_avg_reward_return[episode%100] = parent1.avg_reward
         convergence = converge(parent1_avg_reward_return)
         episode += 1
-        # print('episode', episode) 
-        # print(episode, 'table:', parent1.q_table)  
+        print('episode', episode) 
+        print(episode, 'table:', parent1.q_table)  
         # print(convergence)
         # print('rewards_record',parent1.rewards_record)
-        # print('avg_record',parent1.avg_reward)
+        print('avg_record',parent1.avg_reward)
         # print(episode, parent1.current_train_ep_reward)
         # if episode == 50:
         #     print(parent1.q_table) 
         #     print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
         # print (parent1.q_table)
-        # print(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward)
+
         
+        f.write('episode {}\n'. format(episode))
+        f.write('Avg reward:\n {} {} {} {} \n'.format(parent1.avg_reward, parent2.avg_reward, child1.avg_reward, child2.avg_reward))
+        f.write('Q-table \n Parent1:\n {}\n\n {} \n{} \n\n{}\n {}\n\n {}\n {}\n\n '.format(parent1.q_table, 'Parent2: ', parent2.q_table, 'Child1: ', child1.q_table, 'Child2:', child2.q_table))
+        f.write('Current train ep reward \n: {} {} {} {}'.format(parent1.current_train_ep_reward, parent2.current_train_ep_reward, child1.current_train_ep_reward, child2.current_train_ep_reward))
+
+    f.close()
 
 
 
