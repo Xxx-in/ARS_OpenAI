@@ -161,6 +161,8 @@ def state_to_bucket(state):
     return tuple(bucket_indice)
 
 if __name__ == "__main__":
+    e = open("sarsa_episode.txt", "a")
+    q = open("sarsa_qtable.txt", "a")
     episode = 0
     problem_solved = False  #agent successfully trained
     current_ep_reward = 0
@@ -172,3 +174,7 @@ if __name__ == "__main__":
         episode += 1
     print("Episodes before solved: {}".format(episode-100))
     print("Q-table:", q_table)
+    e.write('\n{}'.format(episode))
+    e.close()
+    q.write('\n{}'.format(q_table))
+    q.close()
