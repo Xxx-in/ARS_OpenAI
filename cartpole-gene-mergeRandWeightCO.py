@@ -205,7 +205,7 @@ def fitness_function(q_table):
     return rewards_record
 
 
-def uniform_crossover (parent1_q_table, parent2_q_table):
+def rand_weight_merge_crossover (parent1_q_table, parent2_q_table):
     child1_q_table = np.zeros(NUM_BUCKETS + (NUM_ACTIONS,))
     child2_q_table = np.zeros(NUM_BUCKETS + (NUM_ACTIONS,))
     for x in range(NUM_BUCKETS[2]):
@@ -244,9 +244,9 @@ def mutation(child_q_table):
    
 if __name__ == "__main__":
         
-    q = open("geneAlgo_uniformCO_qtable.txt", "w")
-    r = open("geneAlgo_uniformCO_reward.txt", "w")
-    e = open("geneAlgo_uniformCO_episode.txt", "a")
+    q = open("geneAlgo_randWeightCO_qtable.txt", "w")
+    r = open("geneAlgo_randWeightCO_reward.txt", "w")
+    e = open("geneAlgo_randWeightCO_episode.txt", "a")
     episode = 0
     
     #initialize population
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     #initial population = 1 sarsa + 1 q-learning + 2 children
     parent1_q_table, parent1_rewards_record[episode%100] = ql_train(episode, parent1_q_table)
     parent2_q_table, parent1_rewards_record[episode%100] = sarsa_train(episode, parent2_q_table)
-    child1_q_table,child2_q_table = uniform_crossover(parent1_q_table, parent2_q_table) # crossover to form another 2 solution
+    child1_q_table,child2_q_table = rand_weight_merge_crossover(parent1_q_table, parent2_q_table) # crossover to form another 2 solution
     
     #compute fitness
     parent1_fitness= fitness_function(parent1_q_table)  
@@ -284,7 +284,7 @@ if __name__ == "__main__":
         parent1_q_table, parent2_q_table = selection(parent1_q_table,parent2_q_table,child1_q_table,child2_q_table, parent1_fitness, parent2_fitness, child1_fitness, child2_fitness)
 
         #crossover
-        child1_q_table, child2_q_table = uniform_crossover(parent1_q_table, parent2_q_table)
+        child1_q_table, child2_q_table = rand_weight_merge_crossover(parent1_q_table, parent2_q_table)
         
         # mutation of child
         child1_q_table = mutation(child1_q_table)
