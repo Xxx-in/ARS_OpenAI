@@ -177,7 +177,7 @@ if __name__ == "__main__":
         episode += 1
     print("Episodes before solved: {}".format(episode-100))
     print("Q-table:", q_table)
-    cartpole_v0_sarsa.py
+    e.write('\n{}'.format(episode-100))
     e.close()
     q.write('\n{}'.format(q_table))
     q.close()
