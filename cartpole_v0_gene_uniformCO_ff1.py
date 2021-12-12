@@ -292,7 +292,7 @@ if __name__ == "__main__":
         child1_q_table = mutation(child1_q_table)
         child2_q_table = mutation(child2_q_table)
 
-        #train child
+        #train population
         child1_q_table, child1_rewards_record[episode%100] = ql_train(episode, child1_q_table)
         child2_q_table, child2_rewards_record[episode%100]  = sarsa_train(episode, child2_q_table)
         parent1_q_table, parent1_rewards_record[episode%100]  = ql_train(episode, parent1_q_table)
