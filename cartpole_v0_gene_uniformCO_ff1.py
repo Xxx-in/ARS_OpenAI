@@ -249,6 +249,7 @@ if __name__ == "__main__":
     q = open("geneAlgo_uniformCO_ff1_qtable.txt", "w")
     r = open("geneAlgo_uniformCO_ff1_reward.txt", "w")
     e = open("geneAlgo_uniformCO_ff1_episode.txt", "a")
+    ff = open("geneAlgo_uniformCO_ff1_fitness.txt", "a")
     episode = 0
     
     #initialize population
@@ -306,6 +307,9 @@ if __name__ == "__main__":
         
         print('Episode:', episode, '//  Fitness value of fittest q_table：', round(np.mean(parent1_fitness),4), '//  Reward yield in this episode by fittest q_table：', parent1_rewards_record[episode%100])
 
+        ff.write('episode {}\n'. format(episode))
+        ff.write('{} {} {} {}\n\n'.format(round(np.mean(parent1_fitness),4), round(np.mean(parent2_fitness),4), round(np.mean(child2_fitness),4), round(np.mean(child2_fitness),4)))
+        
         q.write('episode {}\n'. format(episode))
         q.write('Q-table \n Parent1:\n {}\n\n {} \n{} \n\n{}\n {}\n\n {}\n {}\n\n '.format(parent1_q_table, 'Parent2: ', parent2_q_table, 'Child1: ', child1_q_table, 'Child2:', child2_q_table))
         
@@ -313,15 +317,15 @@ if __name__ == "__main__":
         r.write('Avg reward of latest 100:\n {} {} {} {} \n'.format(np.mean(parent1_rewards_record), np.mean(parent2_rewards_record), np.mean(child1_rewards_record), np.mean(child2_rewards_record)))
         
         episode += 1
-        
+    
     print('Episode before solved: {}'.format(episode-100))
-    
-    
+
     q.write('Episode before solved: {}'.format(episode-100))
     q.close()
     r.write('Episode before solved: {}'.format(episode-100))
     r.close()
     e.write('\n{}'.format(str(episode-100)))
     e.close()
+    ff.close()
             
         

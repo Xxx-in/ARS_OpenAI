@@ -221,6 +221,7 @@ if __name__ == "__main__":
     q = open("geneAlgo_meanWeightCO_ff2_qtable.txt", "w")
     r = open("geneAlgo_meanWeightCO_ff2_reward.txt", "w")
     e = open("geneAlgo_meanWeightCO_ff2_episode.txt", "a")
+    ff = open("geneAlgo_meanWeightCO_ff2_fitness.txt", "a")
     episode = 0
     
     #initialize population
@@ -305,6 +306,8 @@ if __name__ == "__main__":
         r.write('episode {}\n'. format(episode))
         r.write('Avg reward of latest 100:\n {} {} {} {} \n'.format(np.mean(parent1_rewards_record), np.mean(parent2_rewards_record), np.mean(child1_rewards_record), np.mean(child2_rewards_record)))
         
+        ff.write('episode {}\n'. format(episode))
+        ff.write('{} {} {} {}\n\n'.format(parent1_fitness, parent2_fitness, child1_fitness, child2_fitness))
         episode += 1
         
     print('Episode before solved: {}'.format(episode-100))
@@ -316,5 +319,6 @@ if __name__ == "__main__":
     r.close()
     e.write('\n {}'.format(str(episode-100)))
     e.close()
+    ff.close()
             
         

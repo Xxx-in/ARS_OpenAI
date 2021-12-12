@@ -223,6 +223,7 @@ if __name__ == "__main__":
     q = open("geneAlgo_randWeightCO_ff2_qtable.txt", "w")
     r = open("geneAlgo_randWeightCO_ff2_reward.txt", "w")
     e = open("geneAlgo_randWeightCO_ff2_episode.txt", "a")
+    ff = open("geneAlgo_randWeightCO_ff2_fitness.txt", "a")
     episode = 0
     
     #initialize population
@@ -301,6 +302,9 @@ if __name__ == "__main__":
 
         print('Episode:', episode, '//  Fitness value of fittest q_table：', round(np.mean(parent1_fitness),4), '//  Reward yield in this episode by fittest q_table：', parent1_rewards_record[episode%100])
 
+        ff.write('episode {}\n'. format(episode))
+        ff.write('{} {} {} {}\n\n'.format(parent1_fitness, parent2_fitness, child1_fitness, child2_fitness))
+
         q.write('episode {}\n'. format(episode))
         q.write('Q-table \n Parent1:\n {}\n\n {} \n{} \n\n{}\n {}\n\n {}\n {}\n\n '.format(parent1_q_table, 'Parent2: ', parent2_q_table, 'Child1: ', child1_q_table, 'Child2:', child2_q_table))
         
@@ -318,5 +322,6 @@ if __name__ == "__main__":
     r.close()
     e.write('\n {}'.format(str(episode-100)))
     e.close()
+    ff.close()
             
         
